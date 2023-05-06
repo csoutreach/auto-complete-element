@@ -162,7 +162,9 @@ export default class Autocomplete {
     const dataValue = selected.getAttribute('data-autocomplete-data-value') || ''
     const value = selected.getAttribute('data-autocomplete-value') || selected.textContent!
     this.updateFeedbackForScreenReaders(`${selected.textContent || ''} selected.`)
-    this.container.dataValue = dataValue
+    if (this.hiddenInput) {
+      this.container.dataValue = dataValue
+    }
     this.container.value = value
 
     if (!value) {
