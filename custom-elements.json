@@ -96,6 +96,22 @@
               }
             },
             {
+              "kind": "field",
+              "name": "#hiddenInputElement",
+              "privacy": "private",
+              "type": {
+                "text": "HTMLInputElement | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "hiddenInputElement",
+              "type": {
+                "text": "HTMLInputElement | null"
+              }
+            },
+            {
               "kind": "method",
               "name": "#reattachState"
             },
@@ -109,6 +125,13 @@
             {
               "kind": "field",
               "name": "value",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dataValue",
               "type": {
                 "text": "string"
               }
@@ -170,6 +193,9 @@
             },
             {
               "name": "for"
+            },
+            {
+              "name": "data-value"
             }
           ],
           "superclass": {

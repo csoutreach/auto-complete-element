@@ -9,6 +9,7 @@ const SCREEN_READER_DELAY = window.testScreenReaderDelay || 100
 export default class Autocomplete {
   container: AutocompleteElement
   input: HTMLInputElement
+  hiddenInput: HTMLInputElement | null
   results: HTMLElement
   combobox: Combobox
   feedback: HTMLElement | null
@@ -21,11 +22,13 @@ export default class Autocomplete {
   constructor(
     container: AutocompleteElement,
     input: HTMLInputElement,
+    hiddenInput: HTMLInputElement | null,
     results: HTMLElement,
     autoselectEnabled = false,
   ) {
     this.container = container
     this.input = input
+    this.hiddenInput = hiddenInput
     this.results = results
     this.combobox = new Combobox(input, results)
     this.feedback = (container.getRootNode() as Document).getElementById(`${this.results.id}-feedback`)
@@ -101,9 +104,13 @@ export default class Autocomplete {
     }
 
     this.input.value = ''
+    if (this.hiddenInput) {
+      this.hiddenInput.value = ''
+    }
     this.container.value = ''
     this.input.focus()
     this.input.dispatchEvent(new Event('change'))
+    this.hiddenInput?.dispatchEvent(new Event('change'))
     this.container.open = false
   }
 
@@ -152,8 +159,10 @@ export default class Autocomplete {
     if (!(selected instanceof HTMLElement)) return
     this.container.open = false
     if (selected instanceof HTMLAnchorElement) return
+    const dataValue = selected.getAttribute('data-autocomplete-data-value') || ''
     const value = selected.getAttribute('data-autocomplete-value') || selected.textContent!
     this.updateFeedbackForScreenReaders(`${selected.textContent || ''} selected.`)
+    this.container.dataValue = dataValue
     this.container.value = value
 
     if (!value) {
@@ -171,6 +180,7 @@ export default class Autocomplete {
       this.feedback.textContent = ''
     }
     this.container.removeAttribute('value')
+    this.container.removeAttribute('data-value')
     this.fetchResults()
   }
 

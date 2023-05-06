@@ -70,6 +70,19 @@ export class AutoCompleteElement extends HTMLElement {
     this.#reattachState()
   }
 
+  #hiddenInputElement: HTMLInputElement | null = null
+  get hiddenInputElement(): HTMLInputElement | null {
+    if (this.#hiddenInputElement?.isConnected) {
+      return this.#hiddenInputElement
+    }
+    return this.querySelector<HTMLInputElement>("input[type='hidden']")
+  }
+
+  set hiddenInputElement(input: HTMLInputElement | null) {
+    this.#hiddenInputElement = input
+    this.#reattachState()
+  }
+
   connectedCallback(): void {
     if (!this.isConnected) return
     this.#reattachState()
@@ -85,10 +98,10 @@ export class AutoCompleteElement extends HTMLElement {
 
   #reattachState() {
     state.get(this)?.destroy()
-    const {forElement, inputElement} = this
+    const {forElement, inputElement, hiddenInputElement} = this
     if (!forElement || !inputElement) return
     const autoselectEnabled = this.getAttribute('data-autoselect') === 'true'
-    state.set(this, new Autocomplete(this, inputElement, forElement, autoselectEnabled))
+    state.set(this, new Autocomplete(this, inputElement, hiddenInputElement, forElement, autoselectEnabled))
     forElement.setAttribute('role', 'listbox')
   }
 
@@ -106,6 +119,14 @@ export class AutoCompleteElement extends HTMLElement {
 
   set value(value: string) {
     this.setAttribute('value', value)
+  }
+
+  get dataValue(): string {
+    return this.getAttribute('data-value') || ''
+  }
+
+  set dataValue(dataValue: string) {
+    this.setAttribute('data-value', dataValue)
   }
 
   get open(): boolean {
@@ -150,7 +171,7 @@ export class AutoCompleteElement extends HTMLElement {
   }
   //f21528e (add csp trusted types policy)
   static get observedAttributes(): string[] {
-    return ['open', 'value', 'for']
+    return ['open', 'value', 'for', 'data-value']
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
@@ -166,6 +187,9 @@ export class AutoCompleteElement extends HTMLElement {
     switch (name) {
       case 'open':
         newValue === null ? autocomplete.close() : autocomplete.open()
+        break
+      case 'data-value':
+        autocomplete.hiddenInput.value = newValue
         break
       case 'value':
         if (newValue !== null) {
