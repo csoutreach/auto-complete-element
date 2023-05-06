@@ -189,7 +189,9 @@ export class AutoCompleteElement extends HTMLElement {
         newValue === null ? autocomplete.close() : autocomplete.open()
         break
       case 'data-value':
-        autocomplete.hiddenInput.value = newValue
+        if (newValue !== null) {
+          autocomplete.hiddenInput.value = newValue
+        }
         break
       case 'value':
         if (newValue !== null) {
